@@ -1,0 +1,9 @@
+[package]
+name = "tcagm-dev/util"
+description = "Various utility functions I use in my games and packages"
+version = "0.1.4"
+authors = ["TCAGM"]
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+[dependencies]
