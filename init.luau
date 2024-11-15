@@ -239,4 +239,15 @@ function Util.formatTimeLength(t: number): string
 	end
 end
 
+function Util.debounce<K...>(f: (K...) -> nil, time: number): (K...) -> nil
+	local currentThread: thread?
+	return function(...)
+		if currentThread then
+			coroutine.close(currentThread)
+			currentThread = nil
+		end
+		currentThread = task.delay(time, f, ...)
+	end
+end
+
 return Util
