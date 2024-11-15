@@ -2,6 +2,7 @@
 
 local Util = {}
 
+-- Executes the given callback for every player, regardless of if they are in game already
 function Util.forPlayers(callback: (Player) -> nil)
 	game.Players.PlayerAdded:Connect(callback)
 	for _, player in game.Players:GetPlayers() do
@@ -9,6 +10,7 @@ function Util.forPlayers(callback: (Player) -> nil)
 	end
 end
 
+-- Executes the given callback for every player's character that spawns
 function Util.forCharacters(callback: (Model, Player) -> nil)
 	Util.forPlayers(function(player)
 		local characterconnection = player.CharacterAdded:Connect(function(character)
@@ -33,14 +35,18 @@ end)
 game.Players.PlayerRemoving:Connect(function(plr)
 	playerjointimes[plr] = nil
 end)
+
+-- Returns the given player's current session's length
 function Util.getPlayerSessionLength(plr: Player): number
 	return time() - playerjointimes[plr]
 end
 
+-- Removes and returns the first item in a list
 function Util.shift<K>(t: {K}): K?
 	return table.remove(t, 1)
 end
 
+-- Concatenates multiple lists and returns the result
 function Util.merge<K>(t1: {[string]: K}, t2: {[string]: K}): {[string]: K}
 	local result = table.clone(t1)
 	for key, value in pairs(t2) do
@@ -49,6 +55,7 @@ function Util.merge<K>(t1: {[string]: K}, t2: {[string]: K}): {[string]: K}
 	return result
 end
 
+-- Returns the first item in a list that matches the specified predicate
 function Util.match<K>(t: {K}, predicate: (K) -> boolean): K?
 	for _, v in ipairs(t) do
 		if predicate(v) == true then
@@ -58,6 +65,7 @@ function Util.match<K>(t: {K}, predicate: (K) -> boolean): K?
 	return nil
 end
 
+-- Returns the index of the first item in a list that matches the specified predicate
 function Util.find<K>(t: {K}, predicate: (K) -> boolean): number
 	for i, v in ipairs(t) do
 		if predicate(v) == true then
@@ -67,6 +75,7 @@ function Util.find<K>(t: {K}, predicate: (K) -> boolean): number
 	return -1
 end
 
+-- Returns true if any items in the list match the predicate
 function Util.some<K>(t: {K}, predicate: (K) -> boolean): boolean
 	for _, v in ipairs(t) do
 		if predicate(v) == true then
@@ -76,6 +85,7 @@ function Util.some<K>(t: {K}, predicate: (K) -> boolean): boolean
 	return false
 end
 
+-- Returns true if all items in the list match the predicate
 function Util.all<K>(t: {K}, predicate: (K) -> boolean): boolean
 	for _, v in ipairs(t) do
 		if predicate(v) == false then
@@ -85,12 +95,14 @@ function Util.all<K>(t: {K}, predicate: (K) -> boolean): boolean
 	return true
 end
 
+-- Returns whether an item is present in a list
 function Util.contains<K>(t: {K}, needle: K): boolean
 	return Util.some(t, function(v)
 		return v == needle
 	end)
 end
 
+-- Inserts an item at the end of a list <i>if it doesn't exist yet</i>
 function Util.insertAware<K>(t: {K}, item: K): boolean
 	if Util.contains(t, item) then
 		return false
@@ -100,14 +112,17 @@ function Util.insertAware<K>(t: {K}, item: K): boolean
 	end
 end
 
+-- Returns if the haystack string starts with the needle string
 function Util.startswith(haystack: string, needle: string): boolean
 	return string.sub(haystack, 1, string.len(needle)) == needle
 end
 
+-- Returns a random item from the list
 function Util.choose<K>(t: {K}): K
 	return t[math.random(#t)]
 end
 
+-- Returns the list but filtered containing only the items that match the given predicate
 function Util.filter<K>(t: {K}, predicate: (K) -> boolean): {K}
 	local r = {}
 	for _, v in ipairs(t) do
@@ -118,6 +133,7 @@ function Util.filter<K>(t: {K}, predicate: (K) -> boolean): {K}
 	return r
 end
 
+-- Maps the items in a list to another item with the given transform function
 function Util.map<K, T>(t: {K}, transform: (K) -> T): {T}
 	local r = {}
 	for i, v in ipairs(t) do
@@ -126,6 +142,7 @@ function Util.map<K, T>(t: {K}, transform: (K) -> T): {T}
 	return r
 end
 
+-- Returns a list of keys present in a dictionary
 function Util.objectKeys<T>(t: {[T]: any}): {T}
 	local result = {}
 	for key, _ in pairs(t) do
@@ -133,6 +150,8 @@ function Util.objectKeys<T>(t: {[T]: any}): {T}
 	end
 	return result
 end
+
+-- Returns a list of values present in a dictionary
 function Util.objectValues<T>(t: {[any]: T}): {T}
 	local result = {}
 	for _, value in pairs(t) do
@@ -141,6 +160,7 @@ function Util.objectValues<T>(t: {[any]: T}): {T}
 	return result
 end
 
+-- Executes a function every <code>t</code> seconds
 function Util.every(t: number, f: (delta: number) -> nil): thread
 	local c: thread = coroutine.create(function()
 		while true do
@@ -151,6 +171,7 @@ function Util.every(t: number, f: (delta: number) -> nil): thread
 	return c
 end
 
+-- Applies a properties table to an instance
 function Util.applyProperties(instance: Instance, properties: {[string]: any}): Instance
 	for key, value in pairs(properties) do
 		if key ~= "Parent" then -- Skip the Parent property in the loop to do it later and insure it is set last
@@ -162,6 +183,8 @@ function Util.applyProperties(instance: Instance, properties: {[string]: any}): 
 	end
 	return instance
 end
+
+-- Roact-style instance creation; Makes an instance or a clone of an instance and applies the given properties and children tables to it
 function Util.createInstance(class: string | Instance, properties: {[string]: any}?, children: {[string | number]: Instance}?): Instance
 	local instance = if typeof(class) == "string" then Instance.new(class) else class:Clone()
 	
@@ -181,6 +204,7 @@ function Util.createInstance(class: string | Instance, properties: {[string]: an
 	return instance
 end
 
+-- Formats the given time in seconds as a timespan; 2y46d 18h 54m 2s
 function Util.formatTimeLength(t: number): string
 	local seconds = math.floor(t) % 60
 	local minutes = math.floor(t / 60) % 60
