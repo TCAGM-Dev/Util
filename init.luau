@@ -250,4 +250,16 @@ function Util.debounce<K...>(f: (K...) -> nil, time: number): (K...) -> nil
 	end
 end
 
+function Util.throttle<K...>(f: (K...) -> nil, time: number): (K...) -> nil
+	local cooldown = false
+	return function(...)
+		if cooldown then return end
+		cooldown = true
+		task.spawn(f, ...)
+		task.delay(time, function()
+			cooldown = false
+		end)
+	end
+end
+
 return Util
