@@ -192,7 +192,9 @@ function Util.applyChildren(instance: Instance, children: Children): Instance
 		children.Parent = instance
 	elseif typeof(children) == "table" then
 		for key, child in pairs(children) do
-			if typeof(key) == "string" then
+			if typeof(child) == "table" then
+				Util.applyChildren(instance, child)
+			elseif typeof(key) == "string" then
 				child.Name = key
 			end
 			child.Parent = instance
