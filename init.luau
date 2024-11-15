@@ -184,15 +184,19 @@ function Util.applyProperties(instance: Instance, properties: {[string]: any}): 
 	return instance
 end
 
-type Children = Instance | {Instance} | {[string]: Instance}
+type Children = Instance | {Children} | {[string]: Instance}
 
 -- Applies a children table to an instance
 function Util.applyChildren(instance: Instance, children: Children): Instance
-	for key, child in pairs(children) do
-		if typeof(key) == "string" then
-			child.Name = key
+	if typeof(children) == "Instance" then
+		children.Parent = instance
+	elseif typeof(children) == "table" then
+		for key, child in pairs(children) do
+			if typeof(key) == "string" then
+				child.Name = key
+			end
+			child.Parent = instance
 		end
-		child.Parent = instance
 	end
 	return instance
 end
