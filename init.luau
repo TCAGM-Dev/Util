@@ -184,8 +184,20 @@ function Util.applyProperties(instance: Instance, properties: {[string]: any}): 
 	return instance
 end
 
+type Children = Instance | {Instance} | {[string]: Instance}
+
+function Util.applyChildren(instance: Instance, children: Children): Instance
+	for key, child in pairs(children) do
+		if typeof(key) == "string" then
+			child.Name = key
+		end
+		child.Parent = instance
+	end
+	return instance
+end
+
 -- Roact-style instance creation; Makes an instance or a clone of an instance and applies the given properties and children tables to it
-function Util.createInstance(class: string | Instance, properties: {[string]: any}?, children: {[string | number]: Instance}?): Instance
+function Util.createInstance(class: string | Instance, properties: {[string]: any}?, children: Children?): Instance
 	local instance = if typeof(class) == "string" then Instance.new(class) else class:Clone()
 	
 	if properties then
@@ -193,12 +205,7 @@ function Util.createInstance(class: string | Instance, properties: {[string]: an
 	end
 
 	if children then
-		for key, child in pairs(children) do
-			if typeof(key) == "string" then
-				child.Name = key
-			end
-			child.Parent = instance
-		end
+		Util.applyChildren(instance, children)
 	end
 
 	return instance
