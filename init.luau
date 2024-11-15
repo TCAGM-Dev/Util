@@ -239,4 +239,30 @@ function Util.formatTimeLength(t: number): string
 	end
 end
 
+-- Returns a debounced function; Only executes <code>f</code> when it hasn't been executed for <code>time</code> seconds
+-- It recieves the arguments of the latest execution
+function Util.debounce<K...>(f: (K...) -> nil, time: number): (K...) -> nil
+	local currentThread: thread?
+	return function(...)
+		if currentThread then
+			coroutine.close(currentThread)
+			currentThread = nil
+		end
+		currentThread = task.delay(time, f, ...)
+	end
+end
+
+-- Returns a throttled function; Ensures that <code>f</code> is never executed more often than every <code>time</code> seconds
+function Util.throttle<K...>(f: (K...) -> nil, time: number): (K...) -> nil
+	local cooldown = false
+	return function(...)
+		if cooldown then return end
+		cooldown = true
+		task.spawn(f, ...)
+		task.delay(time, function()
+			cooldown = false
+		end)
+	end
+end
+
 return Util
