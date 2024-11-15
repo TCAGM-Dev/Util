@@ -186,6 +186,7 @@ end
 
 type Children = Instance | {Instance} | {[string]: Instance}
 
+-- Applies a children table to an instance
 function Util.applyChildren(instance: Instance, children: Children): Instance
 	for key, child in pairs(children) do
 		if typeof(key) == "string" then
