@@ -122,6 +122,22 @@ function Util.choose<K>(t: {K}): K
 	return t[math.random(#t)]
 end
 
+function Util.weightedRandom<K>(t: {{Value: K, Weight: number}}): {Value: K, Weight: number}
+	local weightSum = 0
+	for _, item in t do
+		weightSum += item.Weight
+	end
+
+	local random = math.random() * weightSum
+
+	for _, item in t do
+		if random < item.Weight then
+			return item
+		end
+		random -= item.Weight
+	end
+end
+
 -- Returns the list but filtered containing only the items that match the given predicate
 function Util.filter<K>(t: {K}, predicate: (K) -> boolean): {K}
 	local r = {}
