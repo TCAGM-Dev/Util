@@ -122,6 +122,7 @@ function Util.choose<K>(t: {K}): K
 	return t[math.random(#t)]
 end
 
+-- Returns a random item from a list, respecting it's weight
 function Util.weightedRandom<K>(t: {{Value: K, Weight: number}}): {Value: K, Weight: number}
 	local weightSum = 0
 	for _, item in t do
